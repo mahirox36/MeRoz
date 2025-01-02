@@ -16,13 +16,13 @@ MonoBehaviour:
   lines:
   - speaker: {fileID: 11400000, guid: a829b2b57feedfd4181306d1555e5891, type: 2}
     text: Hi Ahmad i luv ur mom
-    speedTyping: 1
+    speedTyping: 0.02
     actions: []
   - speaker: {fileID: 11400000, guid: a829b2b57feedfd4181306d1555e5891, type: 2}
-    text: I am fine how aobutr ur mother
-    speedTyping: 1
+    text: I am fine, how aobutr. ur mother
+    speedTyping: 0.02
     actions: []
   - speaker: {fileID: 11400000, guid: a829b2b57feedfd4181306d1555e5891, type: 2}
     text: nigger
-    speedTyping: 1
+    speedTyping: 0.02
     actions: []

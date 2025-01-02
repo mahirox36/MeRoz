@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterName: Meroz
   textColor: {r: 0.013207495, g: 1, b: 0.94562376, a: 1}
-  voiceSound: {fileID: 0}
+  voiceSound: {fileID: 8300000, guid: 0b26b23d2453021479ef9c6244a5f32d, type: 3}
   emotionSprites:
   - emotion: Happy
     sprite: {fileID: 0}
