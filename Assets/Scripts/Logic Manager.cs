@@ -34,7 +34,7 @@ public class LogicManager : MonoBehaviour
         Name.color = sequences[0].lines[0].speaker.textColor;
         text.text = sequences[0].lines[0].text;
     }
-    
+    // test
     void Next(InputAction.CallbackContext context) {
         if (sequenceIndex < sequences.Count) {
             currentSequence = sequences[sequenceIndex];
