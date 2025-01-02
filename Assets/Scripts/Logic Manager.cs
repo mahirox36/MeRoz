@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
-using UnityEngine.UI;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 public class LogicManager : MonoBehaviour
 {
@@ -12,8 +10,10 @@ public class LogicManager : MonoBehaviour
     public GameObject panel;
     public TextMeshProUGUI Name;
     public TextMeshProUGUI text;
-    public List<DialogueLine> Lines;
+    public List<DialogueSequence> sequences;
+    private DialogueSequence currentSequence;
     private int index = 0;
+    private int sequenceIndex = 0;
 
     private void Awake() {
         inputs = new();
@@ -29,23 +29,33 @@ public class LogicManager : MonoBehaviour
 
     private void Start() {
         audioSource = GetComponent<AudioSource>();
-        panel.SetActive(true);
-        Name.text = Lines[index].speaker.characterName;
-        Name.color = Lines[index].speaker.textColor;
-        text.text = Lines[index].text;
-        
+        panel.SetActive(true); 
+        Name.text = sequences[0].lines[0].speaker.characterName;
+        Name.color = sequences[0].lines[0].speaker.textColor;
+        text.text = sequences[0].lines[0].text;
     }
     
     void Next(InputAction.CallbackContext context) {
-        if (index < Lines.Count - 1) {
-            index++;
-            Name.text = Lines[index].speaker.characterName;
-            Name.color = Lines[index].speaker.textColor;
-            text.text = Lines[index].text;
-            if (Lines[index].speaker.voiceSound != null) {
-                audioSource.clip = Lines[index].speaker.voiceSound;
+        if (sequenceIndex < sequences.Count) {
+            currentSequence = sequences[sequenceIndex];
+            if (index < currentSequence.lines.Count - 1) {
+                index++;
+            } else {
+                index = 0;
+                sequenceIndex++;
+                if (sequenceIndex >= sequences.Count) {
+                    panel.SetActive(false);
+                    return;
+                }
+                currentSequence = sequences[sequenceIndex];
+            }
+            Name.text = currentSequence.lines[index].speaker.characterName;
+            Name.color = currentSequence.lines[index].speaker.textColor;
+            text.text = currentSequence.lines[index].text;
+            if (currentSequence.lines[index].speaker.voiceSound != null) {
+                audioSource.clip = currentSequence.lines[index].speaker.voiceSound;
                 audioSource.Play();
             }
         }
-    }   
+    }
 }

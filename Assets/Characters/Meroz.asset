@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f3d490f758c8a443a1b8b51b221c2d0, type: 3}
   m_Name: Meroz
   m_EditorClassIdentifier: 
-  characterName: 
-  textColor: {r: 1, g: 1, b: 1, a: 1}
+  characterName: Meroz
+  textColor: {r: 0.013207495, g: 1, b: 0.94562376, a: 1}
   voiceSound: {fileID: 0}
-  portrait: {fileID: 0}
+  emotionSprites:
+  - emotion: Happy
+    sprite: {fileID: 0}
