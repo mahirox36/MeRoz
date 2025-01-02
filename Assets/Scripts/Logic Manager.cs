@@ -110,6 +110,9 @@ public class LogicManager : MonoBehaviour
                 }
                 currentSequence = sequences[sequenceIndex];
             }
+            if (currentSequence.lines[index].speaker.characterName == "") {
+                return;
+            }
             Name.text = currentSequence.lines[index].speaker.characterName;
             Name.color = currentSequence.lines[index].speaker.textColor;
             
