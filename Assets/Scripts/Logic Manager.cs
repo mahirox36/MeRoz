@@ -3,17 +3,23 @@ using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class LogicManager : MonoBehaviour
 {
-    private Input inputs;
-    private AudioSource audioSource;
-    public GameObject panel;
-    public TextMeshProUGUI Name;
-    public TextMeshProUGUI text;
+    public GameObject Character;
     public List<DialogueSequence> sequences;
-    public SpriteRenderer backgroundRenderer; // For changing backgrounds
+
+    private Input inputs;
+    private Image background;
+    private GameObject panel;
+    private GameObject charactersParent;
+    private Dictionary<string, GameObject> characters = new();
     private DialogueSequence currentSequence;
+    private TextMeshProUGUI Name;
+    private TextMeshProUGUI text;
+    private AudioSource audioSource;
     private int index = 0;
     private int sequenceIndex = 0;
     private Coroutine typingCoroutine;
@@ -29,16 +35,57 @@ public class LogicManager : MonoBehaviour
     private void OnDisable() {
         inputs.Disable();
     }
-
-    private void Start() {
-        audioSource = GetComponent<AudioSource>();
-        panel.SetActive(true); 
-        Name.text = sequences[0].lines[0].speaker.characterName;
-        Name.color = sequences[0].lines[0].speaker.textColor;
-        currentSequence = sequences[0];
-        typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping,
-                currentSequence.lines[index].speaker.voiceSound));
+    public void SetSpeaker() {
+        if (currentSequence.lines[index].speaker != null) {
+            Name.text = currentSequence.lines[index].speaker.characterName;
+            Name.color = currentSequence.lines[index].speaker.textColor;
+        }else{
+            Name.text = "";
+            Name.color = Color.white;
+        }
     }
+
+    private void Start()
+    {
+        // Character is a prefab of a character with an Image component 1
+        background = GameObject.Find("Background").GetComponent<Image>();
+        panel = GameObject.Find("DialoguePanel");
+        charactersParent = GameObject.Find("Canvas");
+        Name = panel.GetComponentsInChildren<TextMeshProUGUI>()[0];
+        text = panel.GetComponentsInChildren<TextMeshProUGUI>()[1];
+        audioSource = GetComponent<AudioSource>();
+        panel.SetActive(true);
+        currentSequence = sequences[0];
+        SetSpeaker();
+        if (currentSequence.lines[index].text != "") {
+            typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping,
+            currentSequence.lines[index].speaker.voiceSound));
+            }
+        else{
+            ExecuteDialogueLine(currentSequence.lines[index]);
+            Next(new InputAction.CallbackContext());
+        }
+        // CreateCharacter(sequences[0].lines[0].speaker);
+    }
+
+    private void CreateCharacter(CharacterData characterData, string emotion = "idle")
+    {
+        GameObject newCharacter = Instantiate(Character, charactersParent.transform);
+        newCharacter.transform.SetSiblingIndex(1);
+        newCharacter.name = characterData.name;
+        newCharacter.GetComponent<CharacterScript>().characterData = characterData;
+        newCharacter.GetComponent<CharacterScript>().ChangeSprite(emotion);
+        characters.Add(characterData.name, newCharacter);
+    }
+
+    private void DeleteCharacter(CharacterData characterData)
+    {
+        GameObject character = characters[characterData.name];
+        characters.Remove(characterData.name);
+        Destroy(character);
+    }
+
+
 
     public void ExecuteDialogueLine(DialogueLine line)
     {
@@ -47,10 +94,19 @@ public class LogicManager : MonoBehaviour
             switch (action.actionType)
             {
                 case ActionType.ChangeBackground:
-                    // ChangeBackground(action.parameter);
+                    background.sprite = action.image;
                     break;
-                case ActionType.ChangeSprite:
-                    // ChangeSprite(action.parameter);
+                case ActionType.ChangeEmotion:
+                    if (!characters.ContainsKey(action.character.name)) {
+                        Debug.LogError($"Character {action.character.name} not found");
+                    }
+                    characters[action.character.name].GetComponent<CharacterScript>().ChangeSprite(action.parameter);
+                    break;
+                case ActionType.CreateCharacter:
+                    CreateCharacter(action.character, action.parameter);
+                    break;
+                case ActionType.DeleteCharacter:
+                    DeleteCharacter(action.character);
                     break;
                 case ActionType.PlaySound:
                     // PlaySound(action.parameter);
@@ -109,15 +165,20 @@ public class LogicManager : MonoBehaviour
                     return;
                 }
                 currentSequence = sequences[sequenceIndex];
-            }
-            if (currentSequence.lines[index].speaker.characterName == "") {
+                
+            }   
+            ExecuteDialogueLine(currentSequence.lines[index]);
+            if (currentSequence.lines[index].text == "") {
+                Next(new InputAction.CallbackContext());
                 return;
             }
-            Name.text = currentSequence.lines[index].speaker.characterName;
-            Name.color = currentSequence.lines[index].speaker.textColor;
-            
+            SetSpeaker();
+            if (currentSequence.lines[index].speaker == null) {
+                typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping, null));
+            }else{
             typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping,
                 currentSequence.lines[index].speaker.voiceSound));
+                }
         }
     }
 }

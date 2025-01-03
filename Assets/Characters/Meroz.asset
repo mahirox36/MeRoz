@@ -16,5 +16,9 @@ MonoBehaviour:
   textColor: {r: 0.013207495, g: 1, b: 0.94562376, a: 1}
   voiceSound: {fileID: 8300000, guid: 0b26b23d2453021479ef9c6244a5f32d, type: 3}
   emotionSprites:
-  - emotion: Happy
-    sprite: {fileID: 0}
+  - emotion: happy
+    sprite: {fileID: 21300000, guid: c8e72baedd19bc14f91669e1cece4c87, type: 3}
+  - emotion: idle
+    sprite: {fileID: 21300000, guid: 7f6a1fb6e7e189241ad979a82d019a35, type: 3}
+  - emotion: sad
+    sprite: {fileID: 21300000, guid: a1a1c55e39f61bb43b466f280f7cb36e, type: 3}
