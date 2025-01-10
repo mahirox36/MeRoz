@@ -1,0 +1,8 @@
+let number = 0;
+let a = Character(name="anas");
+let mahiro = Character(name="Mahiro");
+
+-createCharacter(Character=a, posX=0)
+"Hi mahiro" a
+-createCharacter(Character=mahiro, posX=490)
+"oh hey anas" mahiro

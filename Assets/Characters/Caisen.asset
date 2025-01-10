@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f3d490f758c8a443a1b8b51b221c2d0, type: 3}
-  m_Name: Meroz
+  m_Name: Caisen
   m_EditorClassIdentifier: 
-  characterName: Meroz
+  characterName: Caisen
   textColor: {r: 0.013207495, g: 1, b: 0.94562376, a: 1}
   voiceSound: {fileID: 8300000, guid: 0b26b23d2453021479ef9c6244a5f32d, type: 3}
   emotionSprites:
@@ -22,3 +22,5 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 7f6a1fb6e7e189241ad979a82d019a35, type: 3}
   - emotion: sad
     sprite: {fileID: 21300000, guid: a1a1c55e39f61bb43b466f280f7cb36e, type: 3}
+  - emotion: angry
+    sprite: {fileID: 21300000, guid: 906c5cbc71755a043abbaa93d98ebe26, type: 3}

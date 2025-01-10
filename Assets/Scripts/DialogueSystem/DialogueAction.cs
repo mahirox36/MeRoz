@@ -1,24 +1,31 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 [System.Serializable]
-public class DialogueAction
+public class CreateCharacter
 {
-    public ActionType actionType;
-    public string parameter;
-    public Sprite image;
-    public AudioClip audio;
     public CharacterData character;
-    public AnimationType characterAnimation;
+    public int positionX;
 }
-
-public enum ActionType
+[System.Serializable]
+public class DeleteCharacter
 {
-    ChangeBackground,
-    ChangeEmotion,
-    CreateCharacter,
-    DeleteCharacter,
-    PlaySound
+    public CharacterData character;
+}
+[System.Serializable]
+public class ChangeEmotion
+{
+    public CharacterData character;
+    public Sprite emotion;
+}
+[System.Serializable]
+public class ChangeBackground
+{
+    public Sprite background;
+}
+[System.Serializable]
+public class PlaySound
+{
+    public AudioClip sound;
 }
 
 public enum AnimationType

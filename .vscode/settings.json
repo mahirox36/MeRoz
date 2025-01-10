@@ -56,5 +56,8 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "MeRoz.sln"
+    "dotnet.defaultSolution": "MeRoz.sln",
+    "code-runner.executorMap": {
+        "mahiro":"python C:/Users/yazed/Unity/MeRoz/Assets/Scripts/Mahiro.py"
+    }
 }

@@ -1,0 +1,1 @@
+[{"type": "action", "action": "createCharacter", "character": "anas", "posX": 0}, {"type": "text", "text": "\"Hi mahiro\"", "character": "anas", "speed": 0.02}, {"type": "action", "action": "createCharacter", "character": "Mahiro", "posX": 490}, {"type": "text", "text": "\"oh hey anas\"", "character": "Mahiro", "speed": 0.02}]

@@ -1,15 +1,31 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.IO;
 using TMPro;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.UI;
-using Unity.VisualScripting;
+using Newtonsoft.Json;
 
 public class LogicManager : MonoBehaviour
 {
+
+    [System.Serializable]
+    public class JsonEntry
+    {
+        public string type;
+        public string action;
+        public string character;
+        public string background;
+        public float posX;
+        public string text;
+        public float speed;
+    }
+
     public GameObject Character;
-    public List<DialogueSequence> sequences;
+    public List<DialogueSequence> sequences = new();
+    public List<JsonEntry> JsonData;
+    public string dataName;
 
     private Input inputs;
     private Image background;
@@ -45,8 +61,55 @@ public class LogicManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    void LoadJson()
     {
+        string path = Path.Combine(Application.streamingAssetsPath, $"Dialogues/{dataName}.json");
+        Debug.Log(path);
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+
+            // Deserialize into a list of JsonEntry objects
+            JsonData = JsonConvert.DeserializeObject<List<JsonEntry>>(json);
+            Debug.Log(JsonConvert.SerializeObject(JsonData, Formatting.Indented)); // Pretty print for debugging
+
+
+        }
+        else
+        {
+            Debug.LogError("Cannot find file!");
+        }
+    }
+
+    private void LoadBackgroundByName(string backgroundName)
+    {
+        Sprite backgroundSprite = Resources.Load<Sprite>($"Backgrounds/{backgroundName}");
+        if (backgroundSprite != null)
+        {
+            background.sprite = backgroundSprite;
+        }
+        else
+        {
+            Debug.LogError($"Background with name {backgroundName} not found.");
+        }
+    }
+
+    private void LoadSoundByName(string soundName)
+    {
+        AudioClip soundClip = Resources.Load<AudioClip>($"Sounds/{soundName}");
+        if (soundClip != null)
+        {
+            audioSource.clip = soundClip;
+            audioSource.Play();
+        }
+        else
+        {
+            Debug.LogError($"Sound with name {soundName} not found.");
+        }
+    }
+    private void Start()
+    {   
         // Character is a prefab of a character with an Image component 1
         background = GameObject.Find("Background").GetComponent<Image>();
         panel = GameObject.Find("DialoguePanel");
@@ -55,26 +118,43 @@ public class LogicManager : MonoBehaviour
         text = panel.GetComponentsInChildren<TextMeshProUGUI>()[1];
         audioSource = GetComponent<AudioSource>();
         panel.SetActive(true);
-        currentSequence = sequences[0];
-        SetSpeaker();
-        if (currentSequence.lines[index].text != "") {
-            typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping,
-            currentSequence.lines[index].speaker.voiceSound));
-            }
-        else{
-            ExecuteDialogueLine(currentSequence.lines[index]);
-            Next(new InputAction.CallbackContext());
-        }
+        LoadJson();
+        // currentSequence = sequences[0];
+        // SetSpeaker();
+        // if (currentSequence.lines[index].text != "") {
+        //     typingCoroutine = StartCoroutine(TypeText(currentSequence.lines[index].text, currentSequence.lines[index].speedTyping,
+        //     currentSequence.lines[index].speaker.voiceSound));
+        //     }
+        // else{
+        //     Next(new InputAction.CallbackContext());
+        // }
         // CreateCharacter(sequences[0].lines[0].speaker);
+
     }
 
-    private void CreateCharacter(CharacterData characterData, string emotion = "idle")
+    private CharacterData LoadCharacterDataByName(string characterName)
+    {
+        CharacterData[] allCharacters = Resources.LoadAll<CharacterData>("Characters");
+        foreach (CharacterData character in allCharacters)
+        {
+            if (character.characterName == characterName)
+            {
+                return character;
+            }
+        }
+        Debug.LogError($"CharacterData with name {characterName} not found.");
+        return null;
+    }
+
+    private void CreateCharacter(CharacterData characterData, int positionX, string emotion = "idle")
     {
         GameObject newCharacter = Instantiate(Character, charactersParent.transform);
         newCharacter.transform.SetSiblingIndex(1);
         newCharacter.name = characterData.name;
         newCharacter.GetComponent<CharacterScript>().characterData = characterData;
         newCharacter.GetComponent<CharacterScript>().ChangeSprite(emotion);
+        newCharacter.GetComponent<Image>().SetNativeSize();
+        newCharacter.transform.localPosition = new Vector3(positionX, newCharacter.transform.position.y, newCharacter.transform.position.z);
         characters.Add(characterData.name, newCharacter);
     }
 
@@ -87,33 +167,33 @@ public class LogicManager : MonoBehaviour
 
 
 
-    public void ExecuteDialogueLine(DialogueLine line)
-    {
-        foreach (var action in line.actions)
-        {
-            switch (action.actionType)
-            {
-                case ActionType.ChangeBackground:
-                    background.sprite = action.image;
-                    break;
-                case ActionType.ChangeEmotion:
-                    if (!characters.ContainsKey(action.character.name)) {
-                        Debug.LogError($"Character {action.character.name} not found");
-                    }
-                    characters[action.character.name].GetComponent<CharacterScript>().ChangeSprite(action.parameter);
-                    break;
-                case ActionType.CreateCharacter:
-                    CreateCharacter(action.character, action.parameter);
-                    break;
-                case ActionType.DeleteCharacter:
-                    DeleteCharacter(action.character);
-                    break;
-                case ActionType.PlaySound:
-                    // PlaySound(action.parameter);
-                    break;
-            }
-        }
-    }
+    // public void ExecuteDialogueLine(DialogueLine line)
+    // {
+    //     foreach (var action in line.actions)
+    //     {
+    //         switch (action.actionType)
+    //         {
+    //             case ActionType.ChangeBackground:
+    //                 background.sprite = action.image;
+    //                 break;
+    //             case ActionType.ChangeEmotion:
+    //                 if (!characters.ContainsKey(action.character.name)) {
+    //                     Debug.LogError($"Character {action.character.name} not found");
+    //                 }
+    //                 characters[action.character.name].GetComponent<CharacterScript>().ChangeSprite(action.parameter);
+    //                 break;
+    //             case ActionType.CreateCharacter:
+    //                 CreateCharacter(action.character, action.positionX, action.parameter);
+    //                 break;
+    //             case ActionType.DeleteCharacter:
+    //                 DeleteCharacter(action.character);
+    //                 break;
+    //             case ActionType.PlaySound:
+    //                 // PlaySound(action.parameter);
+    //                 break;
+    //         }
+    //     }
+    // }
 
     private IEnumerator TypeText(string textToType, float typingSpeed, AudioClip audio) {
         text.text = "";
@@ -166,8 +246,7 @@ public class LogicManager : MonoBehaviour
                 }
                 currentSequence = sequences[sequenceIndex];
                 
-            }   
-            ExecuteDialogueLine(currentSequence.lines[index]);
+            }
             if (currentSequence.lines[index].text == "") {
                 Next(new InputAction.CallbackContext());
                 return;
